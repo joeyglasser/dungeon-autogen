@@ -79,7 +79,9 @@ export const Map = () => {
       );
     });
 
-    let horizontal_walls = walls.filter((wall) => wall[0]["y"] == wall[1]["y"]);
+    let horizontal_walls = walls.filter(
+      (wall) => wall[0]["y"] === wall[1]["y"]
+    );
     horizontal_walls.sort((w1, w2) => {
       return (
         Math.max(w2[0]["x"], w2[1]["x"]) - Math.max(w1[0]["x"], w1[1]["x"])
@@ -194,7 +196,10 @@ export const Map = () => {
       {" "}
       <Stage
         width={Math.max(window.innerWidth, width * size)}
-        height={Math.max(window.innerHeight, height * size)}
+        height={Math.min(
+          window.innerHeight,
+          (height + 1) * size + window.innerHeight / 20
+        )}
         ref={stageRef}
       >
         <Provider store={store}>
