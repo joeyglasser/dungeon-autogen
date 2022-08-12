@@ -11,6 +11,8 @@ export const Map = () => {
   const size = useSelector((state) => state.map.size);
   const tile_states = useSelector((state) => state.map.tile_states);
 
+  const min_size = 100;
+
   // Getting reference of stage to call function to export image
   const stageRef = React.useRef(null);
 
@@ -28,7 +30,7 @@ export const Map = () => {
         x: width,
         y: height,
       },
-      pixels_per_grid: Math.max(size, 50),
+      pixels_per_grid: Math.max(size, min_size),
     };
 
     // Adding walls from tile boundaries
@@ -166,7 +168,7 @@ export const Map = () => {
     const y_offset = window.innerHeight / 20;
 
     // Scaling image to meet minimum size for Universal VTT
-    let scale = size < 50 ? 50 / size : 1;
+    let scale = size < min_size ? min_size / size : 1;
 
     // Extracting image
     const url = stageRef.current.toDataURL({
@@ -187,7 +189,7 @@ export const Map = () => {
       type: "text/plain",
     });
     var link = document.createElement("a");
-    link.download = "map.dd2vtt";
+    link.download = `map_${width}x${height}_${new Date().toISOString()}.dd2vtt`;
     link.href = window.URL.createObjectURL(blob);
     link.click();
   }

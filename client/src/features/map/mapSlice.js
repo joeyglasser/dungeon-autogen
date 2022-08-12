@@ -15,6 +15,7 @@ export const mapSlice = createSlice({
           color: "black",
         }))
     ),
+    textures: {},
   },
 
   reducers: {
@@ -62,6 +63,11 @@ export const mapSlice = createSlice({
       state.height = state.tile_states.length;
       state.width = state.tile_states[0].length;
     },
+
+    setTexture: (state, action) => {
+      //   state.textures = { ...state.textures, tile_background: action.payload };
+      state.textures = { tile_background: action.payload };
+    },
   },
 });
 
@@ -71,6 +77,7 @@ export const {
   setSize,
   setTileCondition,
   setTilesCondition,
+  setTexture,
 } = mapSlice.actions;
 
 export default mapSlice.reducer;

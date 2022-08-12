@@ -1,6 +1,10 @@
 import React from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { setSize, setTilesCondition } from "../../features/map/mapSlice";
+import {
+  setSize,
+  setTilesCondition,
+  setTexture,
+} from "../../features/map/mapSlice";
 
 export const Control = () => {
   const dispatch = useDispatch();
@@ -398,6 +402,15 @@ export const Control = () => {
             onTouchEnd={(e) => dispatch(setSize(parseInt(e.target.value)))}
           ></input>
         </label>
+        <input
+          type="file"
+          id="texture"
+          accept="image/png, image/jpeg"
+          onInput={(e) => {
+            const file = e.target.files[0];
+            dispatch(setTexture(URL.createObjectURL(file)));
+          }}
+        ></input>
       </form>
     </div>
   );
