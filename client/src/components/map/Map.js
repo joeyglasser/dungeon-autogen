@@ -196,10 +196,7 @@ export const Map = () => {
       {" "}
       <Stage
         width={Math.max(window.innerWidth, width * size)}
-        height={Math.min(
-          window.innerHeight,
-          (height + 1) * size + window.innerHeight / 20
-        )}
+        height={(height + 1) * size + window.innerHeight / 20}
         ref={stageRef}
       >
         <Provider store={store}>
