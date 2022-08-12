@@ -166,7 +166,7 @@ export const Map = () => {
     const y_offset = window.innerHeight / 20;
 
     // Scaling image to meet minimum size for Universal VTT
-    let scale = size < 50 ? 50 / size : size;
+    let scale = size < 50 ? 50 / size : 1;
 
     // Extracting image
     const url = stageRef.current.toDataURL({
