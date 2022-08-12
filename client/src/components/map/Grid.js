@@ -22,8 +22,10 @@ export const Grid = () => {
           width={size}
           height={size}
           stroke="black"
+          strokeEnabled={tile_states[j][i]["on"]}
           fill={tile_states[j][i]["color"]}
           key={String(i) + "_" + String(j)}
+          strokeWidth={1 / 10}
         ></Rect>
       );
     }
