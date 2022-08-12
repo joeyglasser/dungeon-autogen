@@ -367,20 +367,7 @@ export const Control = () => {
         </label>
         <label>
           Height:{" "}
-          <input
-            type="number"
-            defaultValue={height}
-            id="height_input"
-            // onChange={(e) => dispatch(setHeight(parseInt(e.target.value)))}
-          ></input>
-        </label>
-        <label>
-          Size:{" "}
-          <input
-            type="number"
-            defaultValue={size}
-            onChange={(e) => dispatch(setSize(parseInt(e.target.value)))}
-          ></input>
+          <input type="number" defaultValue={height} id="height_input"></input>
         </label>
         <label>
           Room Padding:{" "}
@@ -399,6 +386,18 @@ export const Control = () => {
           {" "}
           Make Dungeon
         </button>
+        <label>
+          {" "}
+          Size:{" "}
+          <input
+            type="range"
+            defaultValue={size}
+            min="1"
+            max="75"
+            onMouseUp={(e) => dispatch(setSize(parseInt(e.target.value)))}
+            onTouchEnd={(e) => dispatch(setSize(parseInt(e.target.value)))}
+          ></input>
+        </label>
       </form>
     </div>
   );
