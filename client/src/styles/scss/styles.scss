@@ -2,15 +2,25 @@
 @import "../../../node_modules/bootstrap/scss/variables";
 @import "../../../node_modules/bootstrap/scss/mixins";
 
+// Color palatte
+$darkpurple: #291023;
+$lavender: #745E76;
+$floralwhite: #FFF8F0;
+$teal: #55868C;
+$ruby: #F4442E;
+
+
+$darkborder: #0a0409;
 
 body {
   margin: 0;
+  background-color: $floralwhite !important;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  
+
 }
 
 code {
@@ -19,30 +29,28 @@ code {
 }
 
 // Customizing accordion appearance
-$accordion-border-color: #0a0409;
+$accordion-border-color: $darkborder;
 $accordion-border-radius: 0;
 $accordion-inner-border-radius: 0;
 $accordion-button-focus-box-shadow: none;
-$accordion-button-bg:  #291023;
-$accordion-button-active-bg: $accordion-button-bg;
-$accordion-button-active-color:$accordion-button-bg;
+$accordion-button-bg:  $darkpurple;
+$accordion-button-active-bg: $darkpurple;
+$accordion-button-active-color:$darkpurple;
 
 $accordion-button-active-color: white;
 $accordion-color:white;
 
-$accordion-bg: #405a4000 ;
-
 
 .accordion-flush .accordion-collapse{
-    background-color: #745e76;
+    background-color: $lavender;
 }
 
 .accordion-item:last-child{
-    border-bottom: 1px solid #0a0409 !important;
+    border-bottom: 1px solid $darkborder !important;
 }
 
 .accordion-item:first-child{
-    border-top: 1px solid #0a0409 !important;
+    border-top: 1px solid $darkborder !important;
 }
 
 .sidenav {
@@ -52,7 +60,7 @@ $accordion-bg: #405a4000 ;
   width: 350px;
   top: 0;
   left: 0;
-  background-color: #291023;
+  background-color: $darkpurple;
   overflow-x: hidden;
   padding-top: 0px;
   border-top:10px;
