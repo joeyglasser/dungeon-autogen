@@ -6,6 +6,12 @@ import {
   setTexture,
 } from "../../features/map/mapSlice";
 
+import Accordion from "react-bootstrap/Accordion";
+import Form from "react-bootstrap/Form";
+import Col from "react-bootstrap/Col";
+import Row from "react-bootstrap/Row";
+import Button from "react-bootstrap/Button";
+
 export const Control = () => {
   const dispatch = useDispatch();
   const width = useSelector((state) => state.map.width);
@@ -362,56 +368,101 @@ export const Control = () => {
   }
 
   return (
-    <div>
-      <h1>Controls</h1>
-      <form>
-        <label>
-          Width:{" "}
-          <input type="number" defaultValue={width} id="width_input"></input>
-        </label>
-        <label>
-          Height:{" "}
-          <input type="number" defaultValue={height} id="height_input"></input>
-        </label>
-        <label>
-          Room Padding:{" "}
-          <input type="number" defaultValue={1} id="padding_input"></input>
-        </label>
-        <button
-          onClick={(e) => {
-            e.preventDefault();
-            randomize(
-              parseInt(document.getElementById("width_input").value),
-              parseInt(document.getElementById("height_input").value),
-              parseInt(document.getElementById("padding_input").value)
-            );
-          }}
-        >
-          {" "}
-          Make Dungeon
-        </button>
-        <label>
-          {" "}
-          Size:{" "}
-          <input
-            type="range"
-            defaultValue={size}
-            min="1"
-            max="75"
-            onMouseUp={(e) => dispatch(setSize(parseInt(e.target.value)))}
-            onTouchEnd={(e) => dispatch(setSize(parseInt(e.target.value)))}
-          ></input>
-        </label>
-        <input
-          type="file"
-          id="texture"
-          accept="image/png, image/jpeg"
-          onInput={(e) => {
-            const file = e.target.files[0];
-            dispatch(setTexture(URL.createObjectURL(file)));
-          }}
-        ></input>
-      </form>
+    <div className="sidenav">
+      <Accordion defaultActiveKey="0" flush alwaysOpen>
+        <Accordion.Item eventKey="0">
+          <Accordion.Header>Configuration</Accordion.Header>
+          <Accordion.Body>
+            <Form>
+              <Form.Group as={Row}>
+                <Form.Label column sm={3}>
+                  Width
+                </Form.Label>
+                <Col sm={9}>
+                  <Form.Control
+                    id="width_input"
+                    type="number"
+                    defaultValue={width}
+                  />
+                </Col>
+              </Form.Group>
+              <Form.Group as={Row}>
+                <Form.Label column sm={3}>
+                  Height
+                </Form.Label>
+                <Col sm={9}>
+                  <Form.Control
+                    id="height_input"
+                    type="number"
+                    defaultValue={height}
+                  />
+                </Col>
+              </Form.Group>
+              <Form.Group as={Row}>
+                <Form.Label column sm={3}>
+                  Padding
+                </Form.Label>
+                <Col sm={9}>
+                  <Form.Control
+                    id="padding_input"
+                    type="number"
+                    defaultValue={1}
+                  />
+                </Col>
+              </Form.Group>
+              <Form.Group as={Row}>
+                <Form.Label column sm={3}>
+                  Resolution
+                </Form.Label>
+                <Col sm={9}>
+                  <Form.Range
+                    // type="range"
+                    defaultValue={size}
+                    min="1"
+                    max="75"
+                    onMouseUp={(e) =>
+                      dispatch(setSize(parseInt(e.target.value)))
+                    }
+                    onTouchEnd={(e) =>
+                      dispatch(setSize(parseInt(e.target.value)))
+                    }
+                  />
+                </Col>
+              </Form.Group>
+
+              <Form.Group as={Row}>
+                <Button
+                  onClick={(e) => {
+                    e.preventDefault();
+                    randomize(
+                      parseInt(document.getElementById("width_input").value),
+                      parseInt(document.getElementById("height_input").value),
+                      parseInt(document.getElementById("padding_input").value)
+                    );
+                  }}
+                >
+                  {" "}
+                  Generate
+                </Button>
+              </Form.Group>
+            </Form>
+          </Accordion.Body>
+        </Accordion.Item>
+        <Accordion.Item eventKey="1">
+          <Accordion.Header>File Upload</Accordion.Header>
+          <Accordion.Body>
+            <input
+              type="file"
+              id="texture"
+              accept="image/png, image/jpeg"
+              onInput={(e) => {
+                const file = e.target.files[0];
+                dispatch(setTexture(URL.createObjectURL(file)));
+              }}
+            ></input>
+          </Accordion.Body>
+        </Accordion.Item>
+      </Accordion>
     </div>
   );
 };

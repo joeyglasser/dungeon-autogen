@@ -4,6 +4,8 @@ import { Control } from "./components/control/Control";
 
 import { useSelector } from "react-redux";
 
+import "./styles/css/styles.css";
+
 function App() {
   const texture = useSelector((state) => state.map.textures["tile_background"]);
   return (
