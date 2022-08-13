@@ -36,7 +36,8 @@ code {
   height: 2.5rem !important; }
 
 .col-form-label {
-  text-align: left !important; }
+  text-align: left !important;
+  color: white; }
 
 /*!
    * Bootstrap  v5.2.0 (https://getbootstrap.com/)
