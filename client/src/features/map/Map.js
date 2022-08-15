@@ -34,7 +34,7 @@ export const Map = () => {
       size: size,
       tile_states: tile_states,
       textures: textures,
-      x_offset: x_offset,
+      x_offset: 0,
       y_offset: y_offset,
     });
 
@@ -50,7 +50,7 @@ export const Map = () => {
 
         // Getting image data
         const dataURL = stageRef.current.toDataURL({
-          x: x_offset + nav_width,
+          x: x_offset,
           y: y_offset,
           width: width * size,
           height: height * size,
@@ -84,10 +84,11 @@ export const Map = () => {
   const rendered_grid = (
     <Fragment>
       <Stage
-        width={Math.max(window.innerWidth, width * size + nav_width)}
+        width={Math.max(window.innerWidth - nav_width, width * size)}
         height={Math.max(window.innerHeight, height * size)}
         ref={stageRef}
-        x={nav_width}
+        x={x_offset}
+        container="container"
       >
         {grid}
       </Stage>
