@@ -1,18 +1,14 @@
 import "./App.css";
-import { Map } from "./components/map/Map";
-import { Control } from "./components/control/Control";
-
-import { useSelector } from "react-redux";
+import { Map } from "./features/map/Map";
+import { Control } from "./features/map/Control";
 
 import "./styles/css/styles.css";
 
 function App() {
-  const texture = useSelector((state) => state.map.textures["tile_background"]);
   return (
     <div className="App">
       <Control></Control>
       <Map />
-      <img src={texture} alt="" width="0" height="0"></img>
     </div>
   );
 }
