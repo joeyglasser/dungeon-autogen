@@ -8,7 +8,7 @@ function App() {
   return (
     <div className="App">
       <Control></Control>
-      <Map />
+      <Map></Map>
     </div>
   );
 }

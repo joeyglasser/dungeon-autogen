@@ -32,6 +32,8 @@ export const Control = () => {
                     id="width_input"
                     type="number"
                     defaultValue={width}
+                    min="1"
+                    max="150"
                   />
                 </Col>
               </Form.Group>
@@ -44,6 +46,8 @@ export const Control = () => {
                     id="height_input"
                     type="number"
                     defaultValue={height}
+                    min="1"
+                    max="150"
                   />
                 </Col>
               </Form.Group>
@@ -157,9 +161,8 @@ export const Control = () => {
           <Accordion.Header>Export</Accordion.Header>
           <Accordion.Body>
             <Button
-              onClick={(e) => {
+              onClick={async (e) => {
                 e.preventDefault();
-
                 var link = document.createElement("a");
                 link.download = `map_${width}x${height}_${new Date().toISOString()}.png`;
                 link.href = asset_links["image"];
@@ -170,7 +173,7 @@ export const Control = () => {
               PNG
             </Button>
             <Button
-              onClick={(e) => {
+              onClick={async (e) => {
                 e.preventDefault();
 
                 var link = document.createElement("a");

@@ -1,5 +1,7 @@
 import { Layer, Rect } from "react-konva";
 
+// Generates layer of tiles composing the map grid as a promise
+// Need as a promise to load the assets to draw onto the tiles
 export function makeGrid({ size, tile_states, textures, x_offset, y_offset }) {
   if (Object.keys(textures).length === 0) {
     let tiles = [];
@@ -24,6 +26,7 @@ export function makeGrid({ size, tile_states, textures, x_offset, y_offset }) {
 
     return Promise.resolve(<Layer>{tiles}</Layer>);
   }
+
   const loadImagePromise = (asset, imgSrc) => {
     return new Promise((resolve) => {
       let img = new window.Image();
@@ -42,9 +45,12 @@ export function makeGrid({ size, tile_states, textures, x_offset, y_offset }) {
         loadImagePromise(assets[i], textures[assets[i]]["smallImgURL"])
       );
     }
+
+    // Once all images are loaded, the tiles are created
     Promise.all(assetPromises).then((values) => {
       let asset_images = {};
 
+      // Storing assets in an object for reference
       for (let i = 0; i < values.length; i++) {
         let { asset, img } = values[i];
         asset_images[asset] = img;
