@@ -44,25 +44,26 @@ export const Map = () => {
         setLoading(false);
         setToggle(!toggle);
       } else {
-        // Setting minimum size for dd2vtt compatibility
-        const min_size = 100;
-        let scale = size < min_size ? min_size / size : 1;
-
-        // Getting image data
-        const dataURL = stageRef.current.toDataURL({
-          x: x_offset,
-          y: y_offset,
-          width: width * size,
-          height: height * size,
-          pixelRatio: scale,
-          imageSmoothingEnabled: false,
-          quality: 1 / 10,
-        });
-
         // Resetting loading so next time component updates it will rerender again
         setLoading(true);
 
-        dispatch(exportFiles(dataURL));
+        if (stageRef.current) {
+          // Setting minimum size for dd2vtt compatibility
+          const min_size = 100;
+          let scale = size < min_size ? min_size / size : 1;
+
+          // Getting image data
+          const dataURL = stageRef.current.toDataURL({
+            x: x_offset,
+            y: y_offset,
+            width: width * size,
+            height: height * size,
+            pixelRatio: scale,
+            imageSmoothingEnabled: false,
+            quality: 1 / 10,
+          });
+          dispatch(exportFiles(dataURL));
+        }
       }
     });
 
