@@ -1,86 +1,89 @@
-function generateRooms(width, height, padding, room_count) {
-  const rooms = [];
-  const min_dimension = 2;
-  const max_dimension = 30;
+function generateRooms(
+  width,
+  height,
+  padding,
+  roomCount,
+  minDimension = 2,
+  sparsity = 2
+) {
+  let rooms = [];
+  let halfPadding = Math.ceil(padding / 2);
 
-  // Generating nonoverlapping rooms
-  for (let i = 0; i < room_count; i++) {
-    // Generating random room
-    let x1,
-      y1,
-      x2,
-      y2 = 0;
-    x1 = Math.floor(Math.random() * (width - 2 - min_dimension)) + 1;
-    y1 = Math.floor(Math.random() * (height - 2 - min_dimension)) + 1;
-    x2 = Math.max(
-      Math.floor(
-        Math.random() *
-          Math.min(width - 2 - x1 - min_dimension, max_dimension) +
-          x1
-      ),
-      min_dimension + x1
-    );
-    y2 = Math.max(
-      Math.floor(
-        Math.random() *
-          Math.min(height - 2 - y1 - min_dimension, max_dimension) +
-          y1
-      ),
-      min_dimension + y1
-    );
+  const findSplit = (range, halfPadding, minDimension) => {
+    if (range - 2 * halfPadding - 2 * minDimension > 0) {
+      return (
+        Math.floor(
+          Math.random() * (range - 2 * halfPadding - 2 * minDimension)
+        ) +
+        halfPadding +
+        minDimension
+      );
+    } else {
+      return null;
+    }
+  };
 
-    // Detecting if room collides with previous room
-    let collision = false;
-    for (let j = 0; j < rooms.length; j++) {
-      let room = rooms[j];
-      let { x1: r_x1, y1: r_y1, x2: r_x2, y2: r_y2 } = room;
-      if (
-        x1 >= r_x1 - padding &&
-        x1 <= r_x2 + padding &&
-        y1 <= r_y2 + padding
-      ) {
-        if (y2 >= r_y1 - padding) {
-          collision = true;
-          break;
-        }
-      } else if (
-        x2 >= r_x1 - padding &&
-        x2 <= r_x2 + padding &&
-        y2 >= r_y1 - padding
-      ) {
-        if (y1 <= r_y2 + padding) {
-          collision = true;
-          break;
-        }
-      } else if (
-        r_x1 >= x1 - padding &&
-        r_x1 <= x2 + padding &&
-        r_y1 <= y2 + padding
-      ) {
-        if (r_y2 >= y1 - padding) {
-          collision = true;
-          break;
-        }
-      } else if (
-        r_x2 >= x1 - padding &&
-        r_x2 <= x2 + padding &&
-        r_y2 >= y1 - padding
-      ) {
-        if (r_y1 <= y2 + padding) {
-          collision = true;
-          break;
-        }
+  // Initializing with 2 rooms
+  if (width > height) {
+    let split = findSplit(width, halfPadding, minDimension);
+    rooms.push({ x1: 0, x2: split - 1, y1: 0, y2: height - 1 });
+    rooms.push({ x1: split, x2: width - 1, y1: 0, y2: height - 1 });
+  } else {
+    let split = findSplit(height, halfPadding, minDimension);
+    rooms.push({ x1: 0, x2: width - 1, y1: 0, y2: split - 1 });
+    rooms.push({ x1: 0, x2: width - 1, y1: split, y2: height - 1 });
+  }
+
+  let smallRooms = [];
+
+  // Generating rooms until they're too small or there are enough
+  while (rooms.length > 0 && rooms.length < roomCount * sparsity) {
+    let { x1, x2, y1, y2 } = rooms.shift();
+    if (y2 - y1 > x2 - x1) {
+      let split = findSplit(y2 - y1, halfPadding, minDimension);
+      if (split !== null) {
+        rooms.push({ x1: x1, x2: x2, y1: y1, y2: y1 + split - 1 });
+        rooms.push({ x1: x1, x2: x2, y1: y1 + split, y2: y2 });
+      } else {
+        smallRooms.push({ x1, x2, y1, y2 });
+      }
+    } else {
+      let split = findSplit(x2 - x1, halfPadding, minDimension);
+      if (split !== null) {
+        rooms.push({ x1: x1, x2: x1 + split - 1, y1: y1, y2: y2 });
+        rooms.push({ x1: x1 + split, x2: x2, y1: y1, y2: y2 });
+      } else {
+        smallRooms.push({ x1, x2, y1, y2 });
       }
     }
-    if (!collision) {
-      rooms.push({ x1, y1, x2, y2 });
-    }
   }
-  return rooms;
+
+  // Adding back in small rooms
+  rooms = [...rooms, ...smallRooms];
+  console.log([...rooms]);
+  for (const room of rooms) {
+    room.x1 = room.x1 + halfPadding;
+    room.x2 = room.x2 - halfPadding;
+    room.y1 = room.y1 + halfPadding;
+    room.y2 = room.y2 - halfPadding;
+  }
+
+  // Sorting by largest rooms
+  rooms.sort(
+    (r1, r2) =>
+      (r2.x2 - r2.x1) * (r2.y2 - r2.y1) - (r1.x2 - r1.x1) * (r1.y2 - r1.y1)
+  );
+
+  let biggestRooms = [];
+  for (let i = 0; i < Math.min(roomCount, rooms.length); i++) {
+    biggestRooms.push(rooms[i]);
+  }
+
+  return biggestRooms;
 }
 
-export function generateTiles(width, height, padding) {
-  let rooms = generateRooms(width, height, padding, 1000);
+export function generateTiles(width, height, padding, roomCount) {
+  let rooms = generateRooms(width, height, padding, roomCount);
 
   // Initializng tile states
   const tile_states = [...Array(height)].map((e) =>

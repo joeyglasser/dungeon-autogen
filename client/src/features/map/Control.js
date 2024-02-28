@@ -60,6 +60,20 @@ export const Control = () => {
                     id="padding_input"
                     type="number"
                     defaultValue={1}
+                    min="0"
+                  />
+                </Col>
+              </Form.Group>
+              <Form.Group as={Row}>
+                <Form.Label column sm={3}>
+                  Room Count
+                </Form.Label>
+                <Col sm={9}>
+                  <Form.Control
+                    id="room_count_input"
+                    type="number"
+                    defaultValue={20}
+                    min="1"
                   />
                 </Col>
               </Form.Group>
@@ -91,7 +105,12 @@ export const Control = () => {
                       generateMap(
                         parseInt(document.getElementById("width_input").value),
                         parseInt(document.getElementById("height_input").value),
-                        parseInt(document.getElementById("padding_input").value)
+                        parseInt(
+                          document.getElementById("padding_input").value
+                        ),
+                        parseInt(
+                          document.getElementById("room_count_input").value
+                        )
                       )
                     );
                   }}

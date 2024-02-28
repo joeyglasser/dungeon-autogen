@@ -9,6 +9,7 @@ export const mapSlice = createSlice({
     size: 15,
     nav_width: 350,
     map_data: { image: null, dd2vtt: null },
+    // room
     tile_states: [...Array(40)].map((e) =>
       Array(60)
         .fill()
@@ -117,10 +118,11 @@ export default mapSlice.reducer;
 
 // thunk functions
 
-export const generateMap = (width, height, padding) => (dispatch, getState) => {
-  const generatedTiles = generateTiles(width, height, padding);
-  dispatch(setTilesCondition(generatedTiles));
-};
+export const generateMap =
+  (width, height, padding, roomCount) => (dispatch, getState) => {
+    const generatedTiles = generateTiles(width, height, padding, roomCount);
+    dispatch(setTilesCondition(generatedTiles));
+  };
 
 // Resizing assets function for map drawing
 function resizeImage(imageURL, size) {
