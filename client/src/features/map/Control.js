@@ -79,6 +79,20 @@ export const Control = () => {
               </Form.Group>
               <Form.Group as={Row}>
                 <Form.Label column sm={3}>
+                  Room Sparsity
+                </Form.Label>
+                <Col sm={9}>
+                  <Form.Range
+                    defaultValue={2}
+                    step="0.01"
+                    id="sparsity_input"
+                    min="1"
+                    max="5"
+                  />
+                </Col>
+              </Form.Group>
+              <Form.Group as={Row}>
+                <Form.Label column sm={3}>
                   Resolution
                 </Form.Label>
                 <Col sm={9}>
@@ -110,6 +124,9 @@ export const Control = () => {
                         ),
                         parseInt(
                           document.getElementById("room_count_input").value
+                        ),
+                        parseFloat(
+                          document.getElementById("sparsity_input").value
                         )
                       )
                     );

@@ -119,8 +119,14 @@ export default mapSlice.reducer;
 // thunk functions
 
 export const generateMap =
-  (width, height, padding, roomCount) => (dispatch, getState) => {
-    const generatedTiles = generateTiles(width, height, padding, roomCount);
+  (width, height, padding, roomCount, sparsity) => (dispatch, getState) => {
+    const generatedTiles = generateTiles(
+      width,
+      height,
+      padding,
+      roomCount,
+      sparsity
+    );
     dispatch(setTilesCondition(generatedTiles));
   };
 

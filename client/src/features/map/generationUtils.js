@@ -3,8 +3,8 @@ function generateRooms(
   height,
   padding,
   roomCount,
-  minDimension = 2,
-  sparsity = 2
+  sparsity,
+  minDimension = 2
 ) {
   let rooms = [];
   let halfPadding = Math.ceil(padding / 2);
@@ -82,8 +82,8 @@ function generateRooms(
   return biggestRooms;
 }
 
-export function generateTiles(width, height, padding, roomCount) {
-  let rooms = generateRooms(width, height, padding, roomCount);
+export function generateTiles(width, height, padding, roomCount, sparsity) {
+  let rooms = generateRooms(width, height, padding, roomCount, sparsity);
 
   // Initializng tile states
   const tile_states = [...Array(height)].map((e) =>
