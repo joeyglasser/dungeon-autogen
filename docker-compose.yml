@@ -1,6 +1,7 @@
 version: "3"
 services:
   client:
+    image: dungeon-autogen-client
     build: ./client
     user: "node"
     working_dir: /home/node/app
