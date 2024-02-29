@@ -1,0 +1,16 @@
+version: "3"
+services:
+  client:
+    build: ./client
+    user: "node"
+    working_dir: /home/node/app
+    environment:
+      - PORT=80
+    volumes:
+      - ./:/home/node/app
+    expose:
+      - "80"
+    ports:
+      - "80:80"
+    command: >
+      bash -c "cd client/build && serve -s -l 80"
