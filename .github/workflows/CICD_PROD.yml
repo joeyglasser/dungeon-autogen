@@ -38,4 +38,4 @@ jobs:
         run: if [ ! -z "$(doctl registry repository list | grep "$(echo $IMAGE_NAME)")" ]; then doctl registry repository delete-manifest $(echo $IMAGE_NAME) $(doctl registry repository list-tags $(echo $IMAGE_NAME) | grep -o "sha.*") --force; else echo "No repository"; fi
 
       - name: Push image to Container Registry
-        run: docker push ${{secrets.CONTAINER_URL}}/$(echo $IMAGE_NAME):$(echo $GITHUB_SHA))
+        run: docker push ${{secrets.CONTAINER_URL}}/$(echo $IMAGE_NAME):$(echo $GITHUB_SHA)
