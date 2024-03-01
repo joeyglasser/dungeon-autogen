@@ -11,4 +11,4 @@ RUN npm install -g serve
 COPY --chown=node:node . .
 USER node
 EXPOSE 443
-CMD ["bash", "-c",  "cd build && openssl req -x509 -newkey rsa:2048 -keyout keytmp.pem -out cert.pem -days 365 && openssl rsa -in keytmp.pem -out key.pem && export HTTPS=true && SSL_CRT_FILE=cert.pem &&SSL_KEY_FILE=key.pem && serve -s -l 443"]
+CMD ["bash", "-c",  "cd build && openssl req -x509 -newkey rsa:2048 -nodes -keyout keytmp.pem -out cert.pem -days 365 && openssl rsa -in keytmp.pem -out key.pem && export HTTPS=true && SSL_CRT_FILE=cert.pem &&SSL_KEY_FILE=key.pem && serve -s -l 443"]
