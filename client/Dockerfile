@@ -7,6 +7,7 @@ ADD src /home/node/app/src
 RUN npm install
 RUN npm run build
 RUN npm install -g serve
+ENV HTTPS=true
 COPY --chown=node:node . .
 USER node
 EXPOSE 80
