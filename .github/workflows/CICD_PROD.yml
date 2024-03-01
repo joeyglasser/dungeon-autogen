@@ -20,11 +20,8 @@ jobs:
       - name: Checkout the repo
         uses: actions/checkout@v2
 
-      - name: Change directory
-        run: cd client
-
       - name: Build container image
-        run: docker build . -t ${{secrets.CONTAINER_URL}}/$(echo $IMAGE_NAME):$(echo $GITHUB_SHA)
+        run: cd client && docker build . -t ${{secrets.CONTAINER_URL}}/$(echo $IMAGE_NAME):$(echo $GITHUB_SHA)
 
       - name: Install doctl
         uses: digitalocean/action-doctl@v2
