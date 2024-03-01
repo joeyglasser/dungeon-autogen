@@ -6,12 +6,12 @@ services:
     user: "node"
     working_dir: /home/node/app
     environment:
-      - PORT=80
+      - PORT=443
     volumes:
       - ./:/home/node/app
     expose:
-      - "80"
+      - "443"
     ports:
-      - "80:80"
+      - "443:443"
     command: >
-      bash -c "cd client/build && serve -s -l 80"
+      bash -c "cd client/build && serve -s -l 443"

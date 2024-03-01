@@ -54,7 +54,7 @@ jobs:
             docker login -u ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }} -p ${{secrets.DIGITALOCEAN_ACCESS_TOKEN }} registry.digitalocean.com
             docker stop $(echo $IMAGE_NAME)
             docker rm $(echo $IMAGE_NAME)
-            docker run -d -p 80:80 \
+            docker run -d -p 443:443 \
             --restart always \
             --name $(echo $IMAGE_NAME) \
             ${{secrets.CONTAINER_URL}}/$(echo $IMAGE_NAME):$(echo $GITHUB_SHA)
