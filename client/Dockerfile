@@ -10,3 +10,4 @@ RUN npm install -g serve
 COPY --chown=node:node . .
 USER node
 EXPOSE 80
+CMD ["bash", "-c",  "cd build && serve -s -l 80"]

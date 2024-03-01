@@ -20,11 +20,11 @@ jobs:
       - name: Checkout the repo
         uses: actions/checkout@v2
 
-      - name: Build container image
-        run: docker compose build
+      - name: Change directory
+        run: cd client
 
-      - name: Tag client
-        run: docker tag $IMAGE_NAME ${{secrets.CONTAINER_URL}}/$(echo $IMAGE_NAME):$(echo $GITHUB_SHA)
+      - name: Build container image
+        run: docker build . -t $IMAGE_NAME ${{secrets.CONTAINER_URL}}/$(echo $IMAGE_NAME):$(echo $GITHUB_SHA)
 
       - name: Install doctl
         uses: digitalocean/action-doctl@v2
@@ -57,7 +57,7 @@ jobs:
             docker login -u ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }} -p ${{secrets.DIGITALOCEAN_ACCESS_TOKEN }} registry.digitalocean.com
             docker stop $(echo $IMAGE_NAME)
             docker rm $(echo $IMAGE_NAME)
-            docker run -d \
+            docker run -d -p 80:80 \
             --restart always \
             --name $(echo $IMAGE_NAME) \
             ${{secrets.CONTAINER_URL}}/$(echo $IMAGE_NAME):$(echo $GITHUB_SHA)
