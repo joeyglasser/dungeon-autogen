@@ -24,7 +24,7 @@ jobs:
         run: cd client
 
       - name: Build container image
-        run: docker build . -t $IMAGE_NAME ${{secrets.CONTAINER_URL}}/$(echo $IMAGE_NAME):$(echo $GITHUB_SHA)
+        run: docker build . -t ${{secrets.CONTAINER_URL}}/$(echo $IMAGE_NAME):$(echo $GITHUB_SHA)
 
       - name: Install doctl
         uses: digitalocean/action-doctl@v2
