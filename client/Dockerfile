@@ -10,5 +10,5 @@ RUN npm run build
 RUN npm install -g serve
 COPY --chown=node:node . .
 USER node
-EXPOSE 443
-CMD ["bash", "-c",  "cd build && serve -s -l 443"]
+EXPOSE 3000
+CMD ["bash", "-c",  "cd build && serve -s -l 3000"]
