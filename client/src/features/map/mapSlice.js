@@ -4,9 +4,9 @@ import { generateTiles } from "./generationUtils";
 export const mapSlice = createSlice({
   name: "map",
   initialState: {
-    width: 60,
-    height: 40,
-    size: 15,
+    width: 30,
+    height: 30,
+    size: 10,
     nav_width: 350,
     map_data: { image: null, dd2vtt: null },
     // room
