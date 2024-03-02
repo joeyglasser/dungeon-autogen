@@ -3,6 +3,7 @@ import { Layer, Stage } from "react-konva";
 import { makeGrid } from "./Grid";
 import { useSelector, useDispatch } from "react-redux";
 import { exportFiles } from "./mapSlice";
+import { useMediaQuery } from "react-responsive";
 
 export const Map = () => {
   const dispatch = useDispatch();
@@ -12,6 +13,9 @@ export const Map = () => {
   const tile_states = useSelector((state) => state.map.tile_states);
   const textures = useSelector((state) => state.map.textures);
   const nav_width = useSelector((state) => state.map.nav_width);
+  const smallWidth = useMediaQuery({ query: "(max-width: 1224px)" });
+  const portrait = useMediaQuery({ query: "orientation: portrait" });
+  const isMobile = smallWidth || portrait;
 
   // Using these to rerender component once to get updated stage for exporting image
   const [loading, setLoading] = useState(true);
@@ -22,10 +26,12 @@ export const Map = () => {
   const stageRef = React.useRef(null);
 
   // Calculating stage offsets to center map
-  const x_offset = Math.max(
-    (window.innerWidth - nav_width - width * size) / 2,
-    0
-  );
+  let x_offset = 0;
+  if (isMobile) {
+    x_offset = Math.max((window.innerWidth - width * size) / 2, 0);
+  } else {
+    x_offset = Math.max((window.innerWidth - nav_width - width * size) / 2, 0);
+  }
   const y_offset = Math.max((window.innerHeight - height * size) / 2, 0);
 
   // Rerendering and then dispatching action to save image
@@ -85,11 +91,19 @@ export const Map = () => {
   const rendered_grid = (
     <Fragment>
       <Stage
-        width={Math.max(window.innerWidth - nav_width, width * size)}
-        height={Math.max(window.innerHeight, height * size)}
+        width={
+          isMobile
+            ? Math.max(window.innerWidth, width * size)
+            : Math.max(window.innerWidth - nav_width, width * size)
+        }
+        height={
+          isMobile
+            ? Math.max(window.innerHeight * 0.92, height * size * 0.92)
+            : Math.max(window.innerHeight, height * size)
+        }
         ref={stageRef}
         x={x_offset}
-        container="container"
+        container={isMobile ? "mobilecontainer" : "container"}
       >
         {grid}
       </Stage>

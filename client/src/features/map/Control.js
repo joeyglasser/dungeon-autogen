@@ -1,6 +1,7 @@
 import React from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { generateMap, addAsset, setResolution } from "./mapSlice";
+import { useMediaQuery } from "react-responsive";
 
 import Accordion from "react-bootstrap/Accordion";
 import Form from "react-bootstrap/Form";
@@ -15,9 +16,15 @@ export const Control = () => {
   const size = useSelector((state) => state.map.size);
   const nav_width = useSelector((state) => state.map.nav_width);
   const asset_links = useSelector((state) => state.map.map_data);
+  const smallWidth = useMediaQuery({ query: "(max-width: 1224px)" });
+  const portrait = useMediaQuery({ query: "orientation: portrait" });
+  const isMobile = smallWidth || portrait;
 
   return (
-    <div className="sidenav" style={{ width: `${nav_width}px` }}>
+    <div
+      className={isMobile ? "bottomnav" : "sidenav"}
+      style={isMobile ? { width: "100%" } : { width: `${nav_width}px` }}
+    >
       <Accordion defaultActiveKey="0" flush alwaysOpen>
         <Accordion.Item eventKey="0">
           <Accordion.Header>Configuration</Accordion.Header>
