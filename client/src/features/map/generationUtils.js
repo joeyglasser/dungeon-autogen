@@ -1,3 +1,17 @@
+/**
+ * Generates an array of "rooms" which are objects that contain 4 coordinates denoting teh
+ * corners of a room in a 2d space
+ * @param {int} width the width of the space to generate rooms in
+ * @param {int} height the height of the space to generate rooms in
+ * @param {int} padding the minimum number of spaces between rooms
+ * @param {int} roomCount number of rooms we attempt to generate. Can be less if not enough room
+ * given the parameters
+ * @param {float} sparsity controls how many rooms from which we attempt to generate. Example:
+ * if the sparsity is 2.0 and the number of rooms is 10, the algorithm will split the entire
+ * space into 20 rooms and return the largest 10
+ * @param {int} minDimension the minimum height/width of each room
+ * @returns {Array<{x1: int, x2: int, y1: int, y2: int}>} array of coordinates of a room
+ */
 function generateRooms(
   width,
   height,
@@ -6,9 +20,13 @@ function generateRooms(
   sparsity,
   minDimension = 2
 ) {
+  // Initializing rooms
   let rooms = [];
+
+  // Calculating half the padding to use for boundary validation
   let halfPadding = Math.ceil(padding / 2);
 
+  // Helper function to find a valid room split given some range, padding, and dimension requirements
   const findSplit = (range, halfPadding, minDimension) => {
     if (range - 2 * halfPadding - 2 * minDimension > 0) {
       return (
@@ -23,7 +41,7 @@ function generateRooms(
     }
   };
 
-  // Initializing with 2 rooms
+  // Initializing with 2 rooms along the largest dimension
   if (width > height) {
     let split = findSplit(width, halfPadding, minDimension);
     rooms.push({ x1: 0, x2: split - 1, y1: 0, y2: height - 1 });
@@ -34,11 +52,19 @@ function generateRooms(
     rooms.push({ x1: 0, x2: width - 1, y1: split, y2: height - 1 });
   }
 
+  // Storing rooms that are too small to be split further
   let smallRooms = [];
 
   // Generating rooms until they're too small or there are enough
+  // Use a queue to split rooms so that we generally split larger
+  // rooms before smaller ones
   while (rooms.length > 0 && rooms.length < roomCount * sparsity) {
     let { x1, x2, y1, y2 } = rooms.shift();
+
+    // Split along largest dimension (width or height)
+    // Then find a valid split point and add the two smaller rooms
+    // to the queue. If there isn't a valid split point, add the room
+    // to the smallRooms array
     if (y2 - y1 > x2 - x1) {
       let split = findSplit(y2 - y1, halfPadding, minDimension);
       if (split !== null) {
@@ -60,7 +86,8 @@ function generateRooms(
 
   // Adding back in small rooms
   rooms = [...rooms, ...smallRooms];
-  console.log([...rooms]);
+
+  // Reduce room size to enforce padding restrictions
   for (const room of rooms) {
     room.x1 = room.x1 + halfPadding;
     room.x2 = room.x2 - halfPadding;
@@ -74,6 +101,7 @@ function generateRooms(
       (r2.x2 - r2.x1) * (r2.y2 - r2.y1) - (r1.x2 - r1.x1) * (r1.y2 - r1.y1)
   );
 
+  // Returning largest rooms
   let biggestRooms = [];
   for (let i = 0; i < Math.min(roomCount, rooms.length); i++) {
     biggestRooms.push(rooms[i]);
