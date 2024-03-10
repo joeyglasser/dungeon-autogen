@@ -110,11 +110,30 @@ function generateRooms(
   return biggestRooms;
 }
 
+/**
+ * Generates an array that contains the data for the tiles that appear
+ * as the map given input parameters. The data denotes which room the
+ * tiles are a part of if any, if it's the floor or background,
+ * what color they are, and what asset name is attached to the tile. The
+ * function randomly generates a room layout, finds the minimum paths
+ * between rooms and generates hallways using Prim's algorithm. The,
+ * function also adds extra paths between large rooms and rooms around it.
+ * @param {int} width the width of the space to generate rooms in
+ * @param {int} height the height of the space to generate rooms in
+ * @param {int} padding the minimum number of spaces between rooms
+ * @param {int} roomCount number of rooms we attempt to generate. Can be less if not enough room
+ * given the parameters
+ * @param {float} sparsity controls how many rooms from which we attempt to generate. Example:
+ * if the sparsity is 2.0 and the number of rooms is 10, the algorithm will split the entire
+ * space into 20 rooms and return the largest 10
+ * @returns {Array<room: int, floor: bool, color: string, patternAsset: string>}
+ */
 export function generateTiles(width, height, padding, roomCount, sparsity) {
+  // Randomly generate rooms which we'll use to mark the tiles
   let rooms = generateRooms(width, height, padding, roomCount, sparsity);
 
   // Initializng tile states
-  const tile_states = [...Array(height)].map((e) =>
+  const tileStates = [...Array(height)].map((e) =>
     Array(width)
       .fill()
       .map((u) => ({
@@ -130,7 +149,7 @@ export function generateTiles(width, height, padding, roomCount, sparsity) {
     let { x1, y1, x2, y2 } = rooms[i];
     for (let x = x1; x < x2 + 1; x++) {
       for (let y = y1; y < y2 + 1; y++) {
-        tile_states[y][x] = {
+        tileStates[y][x] = {
           room: 0,
           floor: true,
           color: "white",
@@ -140,12 +159,12 @@ export function generateTiles(width, height, padding, roomCount, sparsity) {
     }
   }
 
-  // Labeling rooms using dfs
-  let room_index = 0;
+  // Labeling rooms using depth first search
+  let roomIndex = 0;
   for (let i = 0; i < width; i++) {
     for (let j = 0; j < height; j++) {
-      if (tile_states[j][i]["floor"] && tile_states[j][i]["room"] === 0) {
-        room_index += 1;
+      if (tileStates[j][i]["floor"] && tileStates[j][i]["room"] === 0) {
+        roomIndex += 1;
         let stack = [];
         stack.push([i, j]);
 
@@ -154,24 +173,24 @@ export function generateTiles(width, height, padding, roomCount, sparsity) {
           let x = coord[0];
           let y = coord[1];
 
-          tile_states[y][x]["room"] = room_index;
+          tileStates[y][x]["room"] = roomIndex;
 
-          let neighbor_coords = [];
-          neighbor_coords.push([x + 1, y]);
-          neighbor_coords.push([x, y - 1]);
-          neighbor_coords.push([x - 1, y]);
-          neighbor_coords.push([x, y + 1]);
+          let neighborCoordinates = [];
+          neighborCoordinates.push([x + 1, y]);
+          neighborCoordinates.push([x, y - 1]);
+          neighborCoordinates.push([x - 1, y]);
+          neighborCoordinates.push([x, y + 1]);
 
-          for (let k = 0; k < neighbor_coords.length; k++) {
-            let n_x = neighbor_coords[k][0];
-            let n_y = neighbor_coords[k][1];
+          for (let k = 0; k < neighborCoordinates.length; k++) {
+            let nX = neighborCoordinates[k][0];
+            let nY = neighborCoordinates[k][1];
 
-            if (n_x >= 0 && n_x < width && n_y >= 0 && n_y < height) {
+            if (nX >= 0 && nX < width && nY >= 0 && nY < height) {
               if (
-                tile_states[n_y][n_x]["floor"] &&
-                tile_states[n_y][n_x]["room"] === 0
+                tileStates[nY][nX]["floor"] &&
+                tileStates[nY][nX]["room"] === 0
               ) {
-                stack.push([n_x, n_y]);
+                stack.push([nX, nY]);
               }
             }
           }
@@ -181,111 +200,112 @@ export function generateTiles(width, height, padding, roomCount, sparsity) {
   }
 
   // Computing room statistics
-  const room_stats = [...Array(room_index + 1)]
+  const roomStats = [...Array(roomIndex + 1)]
     .fill()
-    .map((e) => ({ size: 0, x_avg: 0, y_avg: 0, x_node: 0, y_node: 0 }));
+    .map((e) => ({ size: 0, xAvg: 0, yAvg: 0, xNode: 0, yNode: 0 }));
 
   for (let i = 0; i < width; i++) {
     for (let j = 0; j < height; j++) {
-      let tile_room = tile_states[j][i]["room"];
-      room_stats[tile_room]["size"]++;
-      room_stats[tile_room]["x_avg"] += i;
-      room_stats[tile_room]["y_avg"] += j;
-      room_stats[tile_room]["x_node"] = i;
-      room_stats[tile_room]["y_node"] = j;
+      let tileRoom = tileStates[j][i]["room"];
+      roomStats[tileRoom]["size"]++;
+      roomStats[tileRoom]["xAvg"] += i;
+      roomStats[tileRoom]["yAvg"] += j;
+      roomStats[tileRoom]["xNode"] = i;
+      roomStats[tileRoom]["yNode"] = j;
     }
   }
 
-  for (let i = 1; i < room_stats.length; i++) {
-    room_stats[i]["x_avg"] /= room_stats[i]["size"];
-    room_stats[i]["y_avg"] /= room_stats[i]["size"];
+  for (let i = 1; i < roomStats.length; i++) {
+    roomStats[i]["xAvg"] /= roomStats[i]["size"];
+    roomStats[i]["yAvg"] /= roomStats[i]["size"];
   }
 
-  // Use Prim's algorithm to find a minimally spanning tree
+  // Using Prim's algorithm to find a minimally spanning tree
 
   // First storing all distances for computational savings
-  const room_distances = [...Array(room_stats.length)].map((e) =>
-    Array(room_stats.length)
+  const roomDistances = [...Array(roomStats.length)].map((e) =>
+    Array(roomStats.length)
   );
-  for (let i = 0; i < room_stats.length; i++) {
-    for (let j = i; j < room_stats.length; j++) {
+  for (let i = 0; i < roomStats.length; i++) {
+    for (let j = i; j < roomStats.length; j++) {
       let distance = Math.sqrt(
-        (room_stats[j]["x_avg"] - room_stats[i]["x_avg"]) ** 2 +
-          (room_stats[j]["y_avg"] - room_stats[i]["y_avg"]) ** 2
+        (roomStats[j]["xAvg"] - roomStats[i]["xAvg"]) ** 2 +
+          (roomStats[j]["yAvg"] - roomStats[i]["yAvg"]) ** 2
       );
 
-      room_distances[j][i] = distance;
-      room_distances[i][j] = distance;
+      roomDistances[j][i] = distance;
+      roomDistances[i][j] = distance;
     }
   }
 
-  const visited_nodes = [1];
+  const visitedNodes = [1];
   const edges = [];
-  // Prim's algo
-  while (visited_nodes.length < room_stats.length - 1) {
-    let min_distance = Number.POSITIVE_INFINITY;
-    let min_source = 0;
-    let min_destination = 0;
-    for (let i = 0; i < visited_nodes.length; i++) {
-      let room = visited_nodes[i];
-      for (let j = 1; j < room_stats.length; j++) {
+  // Prim's algorithm
+  while (visitedNodes.length < roomStats.length - 1) {
+    let minDistance = Number.POSITIVE_INFINITY;
+    let minSource = 0;
+    let minDestination = 0;
+    for (let i = 0; i < visitedNodes.length; i++) {
+      let room = visitedNodes[i];
+      for (let j = 1; j < roomStats.length; j++) {
         if (
           j !== room &&
-          !visited_nodes.includes(j) &&
-          room_distances[j][room] < min_distance
+          !visitedNodes.includes(j) &&
+          roomDistances[j][room] < minDistance
         ) {
-          min_destination = j;
-          min_distance = room_distances[j][room];
-          min_source = room;
+          minDestination = j;
+          n_y;
+          minDistance = roomDistances[j][room];
+          minSource = room;
         }
       }
     }
-    edges.push([min_source, min_destination]);
-    visited_nodes.push(min_destination);
+    edges.push([minSource, minDestination]);
+    visitedNodes.push(minDestination);
   }
 
   // Add in some extra edges for large rooms
-  const avg_room_size =
-    room_stats.reduce(
+  const avgRoomSize =
+    roomStats.reduce(
       (previousValue, currentValue) => previousValue + currentValue["size"],
       0
-    ) / room_stats.length;
+    ) / roomStats.length;
 
-  const large_rooms = [];
-  for (let i = 0; i < room_stats.length; i++) {
-    if (room_stats[i]["size"] > avg_room_size) {
-      large_rooms.push(i);
+  const largeRooms = [];
+  for (let i = 0; i < roomStats.length; i++) {
+    if (roomStats[i]["size"] > avgRoomSize) {
+      largeRooms.push(i);
     }
   }
 
-  for (let i = 0; i < large_rooms.length; i++) {
-    let min_distance = Number.POSITIVE_INFINITY;
-    let min_room = 0;
-    for (let j = 1; j < room_stats.length; j++) {
-      if (j !== large_rooms[i]) {
-        let edge_exists = false;
+  for (let i = 0; i < largeRooms.length; i++) {
+    let minDistance = Number.POSITIVE_INFINITY;
+    let minRoom = 0;
+    for (let j = 1; j < roomStats.length; j++) {
+      if (j !== largeRooms[i]) {
+        let edgeExists = false;
         for (let k = 0; k < edges.length; k++) {
-          edge_exists =
-            edge_exists ||
-            (edges[k].includes(large_rooms[i]) && edges[k].includes(j));
+          edgeExists =
+            edgeExists ||
+            (edges[k].includes(largeRooms[i]) && edges[k].includes(j));
         }
-        if (!edge_exists) {
-          if (room_distances[j][large_rooms[i]] < min_distance) {
-            min_room = j;
-            min_distance = room_distances[j][large_rooms[i]];
+        if (!edgeExists) {
+          if (roomDistances[j][largeRooms[i]] < minDistance) {
+            minRoom = j;
+            minDistance = roomDistances[j][largeRooms[i]];
           }
         }
       }
     }
-    if (min_room !== 0) {
-      edges.push([large_rooms[i], min_room]);
+    if (minRoom !== 0) {
+      edges.push([largeRooms[i], minRoom]);
     }
   }
 
   // Using modified djikstra's algo to find path to neighbors
-  for (let i = 1; i < room_stats.length; i++) {
+  for (let i = 1; i < roomStats.length; i++) {
     let targets = [];
-    let target_stats = {};
+    let targetStats = {};
 
     for (let j = 0; j < edges.length; j++) {
       if (edges[j].includes(i)) {
@@ -294,11 +314,11 @@ export function generateTiles(width, height, padding, roomCount, sparsity) {
       }
     }
 
-    for (let j = 0; j < room_stats.length; j++) {
-      target_stats[j] = {
+    for (let j = 0; j < roomStats.length; j++) {
+      targetStats[j] = {
         x: -1,
         y: -1,
-        min_distance: Number.POSITIVE_INFINITY,
+        minDistance: Number.POSITIVE_INFINITY,
       };
     }
 
@@ -306,8 +326,8 @@ export function generateTiles(width, height, padding, roomCount, sparsity) {
       let shortest_paths = [...Array(height)].map((e) =>
         Array(width).fill(Number.POSITIVE_INFINITY)
       );
-      let stack = [[room_stats[i]["x_node"], room_stats[i]["y_node"]]];
-      shortest_paths[room_stats[i]["y_node"]][room_stats[i]["x_node"]] = 0;
+      let stack = [[roomStats[i]["xNode"], roomStats[i]["yNode"]]];
+      shortest_paths[roomStats[i]["yNode"]][roomStats[i]["xNode"]] = 0;
       while (stack.length > 0) {
         let coord = stack.pop();
         let x = coord[0];
@@ -322,31 +342,31 @@ export function generateTiles(width, height, padding, roomCount, sparsity) {
         ];
 
         for (let j = 0; j < neighbors.length; j++) {
-          let neighbor_coords = neighbors[j];
-          let n_x = neighbor_coords[0];
-          let n_y = neighbor_coords[1];
-          if (n_x >= 0 && n_x < width && n_y >= 0 && n_y < height) {
-            if (!Number.isFinite(shortest_paths[n_y][n_x])) {
-              stack.unshift([n_x, n_y]);
+          let neighborCoordinates = neighbors[j];
+          let nX = neighborCoordinates[0];
+          let nY = neighborCoordinates[1];
+          if (nX >= 0 && nX < width && nY >= 0 && nY < height) {
+            if (!Number.isFinite(shortest_paths[nY][nX])) {
+              stack.unshift([nX, nY]);
             }
 
-            if (coord_distance + 1 < shortest_paths[n_y][n_x]) {
-              if (tile_states[n_y][n_x]["room"] === i) {
-                shortest_paths[n_y][n_x] = 0;
+            if (coord_distance + 1 < shortest_paths[nY][nX]) {
+              if (tileStates[nY][nX]["room"] === i) {
+                shortest_paths[nY][nX] = 0;
               } else {
-                shortest_paths[n_y][n_x] = coord_distance + 1;
+                shortest_paths[nY][nX] = coord_distance + 1;
               }
             }
 
             // Getting coordinate of each room closest to source room
             if (
-              shortest_paths[n_y][n_x] <
-              target_stats[tile_states[n_y][n_x]["room"]]["min_distance"]
+              shortest_paths[nY][nX] <
+              targetStats[tileStates[nY][nX]["room"]]["minDistance"]
             ) {
-              target_stats[tile_states[n_y][n_x]["room"]]["min_distance"] =
-                shortest_paths[n_y][n_x];
-              target_stats[tile_states[n_y][n_x]["room"]]["x"] = n_x;
-              target_stats[tile_states[n_y][n_x]["room"]]["y"] = n_y;
+              targetStats[tileStates[nY][nX]["room"]]["minDistance"] =
+                shortest_paths[nY][nX];
+              targetStats[tileStates[nY][nX]["room"]]["x"] = nX;
+              targetStats[tileStates[nY][nX]["room"]]["y"] = nY;
             }
           }
         }
@@ -354,8 +374,8 @@ export function generateTiles(width, height, padding, roomCount, sparsity) {
 
       // Making hallways between rooms using shortest path
       for (let j = 0; j < targets.length; j++) {
-        let x = target_stats[targets[j]]["x"];
-        let y = target_stats[targets[j]]["y"];
+        let x = targetStats[targets[j]]["x"];
+        let y = targetStats[targets[j]]["y"];
         let distance = shortest_paths[y][x];
 
         while (distance > 0) {
@@ -367,17 +387,17 @@ export function generateTiles(width, height, padding, roomCount, sparsity) {
           ];
 
           for (let j = 0; j < neighbors.length; j++) {
-            let neighbor_coords = neighbors[j];
-            let n_x = neighbor_coords[0];
-            let n_y = neighbor_coords[1];
-            if (n_x >= 0 && n_x < width && n_y >= 0 && n_y < height) {
-              if (shortest_paths[n_y][n_x] === distance - 1) {
-                tile_states[n_y][n_x]["color"] = "white";
-                tile_states[n_y][n_x]["floor"] = true;
-                tile_states[n_y][n_x]["patternAsset"] = "flooring";
+            let neighborCoordinates = neighbors[j];
+            let nX = neighborCoordinates[0];
+            let nY = neighborCoordinates[1];
+            if (nX >= 0 && nX < width && nY >= 0 && nY < height) {
+              if (shortest_paths[nY][nX] === distance - 1) {
+                tileStates[nY][nX]["color"] = "white";
+                tileStates[nY][nX]["floor"] = true;
+                tileStates[nY][nX]["patternAsset"] = "flooring";
                 distance--;
-                x = n_x;
-                y = n_y;
+                x = nX;
+                y = nY;
                 break;
               }
             }
@@ -386,5 +406,5 @@ export function generateTiles(width, height, padding, roomCount, sparsity) {
       }
     }
   }
-  return tile_states;
+  return tileStates;
 }
