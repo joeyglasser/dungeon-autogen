@@ -254,7 +254,6 @@ export function generateTiles(width, height, padding, roomCount, sparsity) {
           roomDistances[j][room] < minDistance
         ) {
           minDestination = j;
-          n_y;
           minDistance = roomDistances[j][room];
           minSource = room;
         }

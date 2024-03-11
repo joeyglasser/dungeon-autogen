@@ -15,7 +15,7 @@ export const Control = () => {
   const height = useSelector((state) => state.map.height);
   const size = useSelector((state) => state.map.size);
   const navigationWidth = useSelector((state) => state.map.navigationWidth);
-  const asset_links = useSelector((state) => state.map.mapData);
+  const assetLinks = useSelector((state) => state.map.mapData);
   const smallWidth = useMediaQuery({ query: "(max-width: 1224px)" });
   const portrait = useMediaQuery({ query: "orientation: portrait" });
   const isMobile = smallWidth || portrait;
@@ -165,7 +165,7 @@ export const Control = () => {
                     if (file) {
                       dispatch(
                         addAsset({
-                          asset_name: "flooring",
+                          assetName: "flooring",
                           imageURL: imageURL,
                         })
                       );
@@ -189,7 +189,7 @@ export const Control = () => {
                     if (file) {
                       dispatch(
                         addAsset({
-                          asset_name: "background",
+                          assetName: "background",
                           imageURL: imageURL,
                         })
                       );
@@ -208,8 +208,8 @@ export const Control = () => {
                 e.preventDefault();
                 var link = document.createElement("a");
                 link.download = `map_${width}x${height}_${new Date().toISOString()}.png`;
-                link.href = asset_links["image"];
-                console.log({ asset_links });
+                link.href = assetLinks["image"];
+                console.log({ assetLinks });
                 link.click();
               }}
             >
@@ -221,7 +221,7 @@ export const Control = () => {
 
                 var link = document.createElement("a");
                 link.download = `map_${width}x${height}_${new Date().toISOString()}.dd2vtt`;
-                link.href = asset_links["dd2vtt"];
+                link.href = assetLinks["dd2vtt"];
                 link.click();
               }}
             >
