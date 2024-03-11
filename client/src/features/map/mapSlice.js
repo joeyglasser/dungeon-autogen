@@ -7,10 +7,10 @@ export const mapSlice = createSlice({
     width: 30,
     height: 30,
     size: 10,
-    nav_width: 350,
-    map_data: { image: null, dd2vtt: null },
+    navigationWidth: 350,
+    mapData: { image: null, dd2vtt: null },
     // room
-    tile_states: [...Array(40)].map((e) =>
+    tileStates: [...Array(40)].map((e) =>
       Array(60)
         .fill()
         .map((u) => ({
@@ -37,52 +37,52 @@ export const mapSlice = createSlice({
     },
 
     setTileCondition: (state, action) => {
-      const { tile_x, tile_y, condition } = action.payload;
-      const tile_state_copy = state.tile_states.map((r) => [...r]);
-      tile_state_copy[tile_y][tile_x] = condition;
-      state.tile_states = tile_state_copy;
+      const { tileX, tileY, condition } = action.payload;
+      const tile_state_copy = state.tileStates.map((r) => [...r]);
+      tile_state_copy[tileY][tileX] = condition;
+      state.tileStates = tile_state_copy;
     },
 
     setTilesCondition: (state, action) => {
-      state.tile_states = action.payload;
-      state.height = state.tile_states.length;
-      state.width = state.tile_states[0].length;
+      state.tileStates = action.payload;
+      state.height = state.tileStates.length;
+      state.width = state.tileStates[0].length;
     },
 
     setTilesTexture: (state, action) => {
-      let new_tile_states = [...Array(state.height)].map((e) =>
+      let newTileStates = [...Array(state.height)].map((e) =>
         Array(state.width)
       );
-      const { texture, on_criteria, room_criteria } = action.payload;
+      const { texture, onCritieria, roomCriteria } = action.payload;
 
       for (let j = 0; j < state.height; j++) {
         for (let i = 0; i < state.width; i++) {
-          let tile = state.tile_states[j][i];
+          let tile = state.tileStates[j][i];
           if (
-            (tile["floor"] === on_criteria || on_criteria == null) &&
-            (tile["room"] === room_criteria || room_criteria == null)
+            (tile["floor"] === onCritieria || onCritieria == null) &&
+            (tile["room"] === roomCriteria || roomCriteria == null)
           ) {
-            new_tile_states[j][i] = { ...tile, patternImage: texture };
+            newTileStates[j][i] = { ...tile, patternImage: texture };
           } else {
-            new_tile_states[j][i] = tile;
+            newTileStates[j][i] = tile;
           }
         }
       }
-      state.tile_states = new_tile_states;
+      state.tileStates = newTileStates;
     },
 
     setNavWidth: (state, action) => {
-      state.nav_width = action.payload;
+      state.navigationWidth = action.payload;
     },
 
     setMapData: (state, action) => {
       const { asset, href } = action.payload;
-      state.map_data[asset] = href;
+      state.mapData[asset] = href;
     },
 
     setTexture: (state, action) => {
-      const { asset_name, imageURL, smallImgURL } = action.payload;
-      state.textures[asset_name] = {
+      const { assetName, imageURL, smallImgURL } = action.payload;
+      state.textures[assetName] = {
         imageURL: imageURL,
         smallImgURL: smallImgURL,
       };
@@ -91,8 +91,8 @@ export const mapSlice = createSlice({
     setTextures: (state, action) => {
       let textures = action.payload;
       for (let i = 0; i < textures.length; i++) {
-        let { asset_name, imageURL, smallImgURL } = textures[i];
-        state.textures[asset_name] = {
+        let { assetName, imageURL, smallImgURL } = textures[i];
+        state.textures[assetName] = {
           imageURL: imageURL,
           smallImgURL: smallImgURL,
         };
@@ -156,14 +156,14 @@ function resizeImage(imageURL, size) {
 }
 
 export const addAsset =
-  ({ asset_name, imageURL }) =>
+  ({ assetName, imageURL }) =>
   async (dispatch, getState) => {
     const state = getState();
     let size = state.map.size;
     let smallImgURL;
     try {
       smallImgURL = await resizeImage(imageURL, size);
-      dispatch(setTexture({ asset_name, imageURL, smallImgURL }));
+      dispatch(setTexture({ assetName, imageURL, smallImgURL }));
     } catch (error) {
       console.log({ error });
     }
@@ -172,21 +172,21 @@ export const addAsset =
 export const setResolution = (size) => async (dispatch, getState) => {
   let state = getState();
   let textures = state.map.textures;
-  let texture_assets = Object.keys(textures);
+  let textureAssets = Object.keys(textures);
 
   // Resizing all loaded textures
   try {
-    let new_textures = [];
-    for (let i = 0; i < texture_assets.length; i++) {
-      let asset = texture_assets[i];
+    let newTextures = [];
+    for (let i = 0; i < textureAssets.length; i++) {
+      let asset = textureAssets[i];
       let newSmallImgURL = await resizeImage(textures[asset]["imageURL"], size);
-      new_textures.push({
-        asset_name: asset,
+      newTextures.push({
+        assetName: asset,
         imageURL: textures[asset]["imageURL"],
         smallImgURL: newSmallImgURL,
       });
     }
-    dispatch(setTextures(new_textures));
+    dispatch(setTextures(newTextures));
     dispatch(setSize(size));
   } catch (error) {
     console.log({ error });
@@ -195,7 +195,7 @@ export const setResolution = (size) => async (dispatch, getState) => {
 
 export const exportFiles = (dataURL) => (dispatch, getState) => {
   const state = getState();
-  let { size, tile_states, width, height, nav_width } = state.map;
+  let { size, tileStates, width, height, navigationWidth } = state.map;
 
   let image_str = dataURL.split(",")[1];
 
@@ -207,7 +207,7 @@ export const exportFiles = (dataURL) => (dispatch, getState) => {
   map_output["format"] = 0.2;
   map_output["resolution"] = {
     map_origin: {
-      x: nav_width,
+      x: navigationWidth,
       y: 0,
     },
     map_size: {
@@ -223,8 +223,8 @@ export const exportFiles = (dataURL) => (dispatch, getState) => {
     for (let j = 0; j < height - 1; j++) {
       // Checks for boudary on the right side of the tile and below the tile
       if (
-        (tile_states[j][i]["floor"] || tile_states[j][i + 1]["floor"]) &&
-        !(tile_states[j][i]["floor"] && tile_states[j][i + 1]["floor"])
+        (tileStates[j][i]["floor"] || tileStates[j][i + 1]["floor"]) &&
+        !(tileStates[j][i]["floor"] && tileStates[j][i + 1]["floor"])
       ) {
         walls.push([
           {
@@ -238,8 +238,8 @@ export const exportFiles = (dataURL) => (dispatch, getState) => {
         ]);
       }
       if (
-        (tile_states[j][i]["floor"] || tile_states[j + 1][i]["floor"]) &&
-        !(tile_states[j][i]["floor"] && tile_states[j + 1][i]["floor"])
+        (tileStates[j][i]["floor"] || tileStates[j + 1][i]["floor"]) &&
+        !(tileStates[j][i]["floor"] && tileStates[j + 1][i]["floor"])
       ) {
         walls.push([
           {
@@ -256,25 +256,25 @@ export const exportFiles = (dataURL) => (dispatch, getState) => {
   }
 
   // Simplifying walls by joining when possible
-  let reduced_walls = [];
+  let reducedWalls = [];
 
-  let vertical_walls = walls.filter((wall) => wall[0]["x"] === wall[1]["x"]);
-  vertical_walls.sort((w1, w2) => {
+  let verticalWalls = walls.filter((wall) => wall[0]["x"] === wall[1]["x"]);
+  verticalWalls.sort((w1, w2) => {
     return Math.max(w2[0]["y"], w2[1]["y"]) - Math.max(w1[0]["y"], w1[1]["y"]);
   });
 
-  let horizontal_walls = walls.filter((wall) => wall[0]["y"] === wall[1]["y"]);
-  horizontal_walls.sort((w1, w2) => {
+  let horizontalWalls = walls.filter((wall) => wall[0]["y"] === wall[1]["y"]);
+  horizontalWalls.sort((w1, w2) => {
     return Math.max(w2[0]["x"], w2[1]["x"]) - Math.max(w1[0]["x"], w1[1]["x"]);
   });
 
   // Simplifying vertical walls
-  for (let i = 0; i < vertical_walls.length; i++) {
-    if (vertical_walls[i]) {
-      let wall = vertical_walls[i];
-      for (let j = i + 1; j < vertical_walls.length; j++) {
-        if (vertical_walls[j]) {
-          let secondWall = vertical_walls[j];
+  for (let i = 0; i < verticalWalls.length; i++) {
+    if (verticalWalls[i]) {
+      let wall = verticalWalls[i];
+      for (let j = i + 1; j < verticalWalls.length; j++) {
+        if (verticalWalls[j]) {
+          let secondWall = verticalWalls[j];
           if (wall[0]["x"] === secondWall[0]["x"]) {
             if (
               wall[0]["y"] === secondWall[0]["y"] ||
@@ -282,30 +282,30 @@ export const exportFiles = (dataURL) => (dispatch, getState) => {
               wall[1]["y"] === secondWall[0]["y"] ||
               wall[1]["y"] === secondWall[1]["y"]
             ) {
-              let y_coords = [
+              let yCoordinates = [
                 wall[0]["y"],
                 wall[1]["y"],
                 secondWall[0]["y"],
                 secondWall[1]["y"],
               ];
-              wall[0]["y"] = Math.min(...y_coords);
-              wall[1]["y"] = Math.max(...y_coords);
-              vertical_walls[j] = null;
+              wall[0]["y"] = Math.min(...yCoordinates);
+              wall[1]["y"] = Math.max(...yCoordinates);
+              verticalWalls[j] = null;
             }
           }
         }
       }
-      reduced_walls.push(wall);
+      reducedWalls.push(wall);
     }
   }
 
   // Simplifiying horizontal walls
-  for (let i = 0; i < horizontal_walls.length; i++) {
-    if (horizontal_walls[i]) {
-      let wall = horizontal_walls[i];
-      for (let j = i + 1; j < horizontal_walls.length; j++) {
-        if (horizontal_walls[j]) {
-          let secondWall = horizontal_walls[j];
+  for (let i = 0; i < horizontalWalls.length; i++) {
+    if (horizontalWalls[i]) {
+      let wall = horizontalWalls[i];
+      for (let j = i + 1; j < horizontalWalls.length; j++) {
+        if (horizontalWalls[j]) {
+          let secondWall = horizontalWalls[j];
           if (wall[0]["y"] === secondWall[0]["y"]) {
             if (
               wall[0]["x"] === secondWall[0]["x"] ||
@@ -313,24 +313,24 @@ export const exportFiles = (dataURL) => (dispatch, getState) => {
               wall[1]["x"] === secondWall[0]["x"] ||
               wall[1]["x"] === secondWall[1]["x"]
             ) {
-              let x_coords = [
+              let xCoordinates = [
                 wall[0]["x"],
                 wall[1]["x"],
                 secondWall[0]["x"],
                 secondWall[1]["x"],
               ];
-              wall[0]["x"] = Math.min(...x_coords);
-              wall[1]["x"] = Math.max(...x_coords);
-              horizontal_walls[j] = null;
+              wall[0]["x"] = Math.min(...xCoordinates);
+              wall[1]["x"] = Math.max(...xCoordinates);
+              horizontalWalls[j] = null;
             }
           }
         }
       }
-      reduced_walls.push(wall);
+      reducedWalls.push(wall);
     }
   }
 
-  map_output["line_of_sight"] = reduced_walls;
+  map_output["line_of_sight"] = reducedWalls;
 
   // Setting other attributes to defualt values for now
   map_output["portals"] = [];

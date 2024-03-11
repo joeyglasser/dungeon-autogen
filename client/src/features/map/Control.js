@@ -14,8 +14,8 @@ export const Control = () => {
   const width = useSelector((state) => state.map.width);
   const height = useSelector((state) => state.map.height);
   const size = useSelector((state) => state.map.size);
-  const nav_width = useSelector((state) => state.map.nav_width);
-  const asset_links = useSelector((state) => state.map.map_data);
+  const navigationWidth = useSelector((state) => state.map.navigationWidth);
+  const asset_links = useSelector((state) => state.map.mapData);
   const smallWidth = useMediaQuery({ query: "(max-width: 1224px)" });
   const portrait = useMediaQuery({ query: "orientation: portrait" });
   const isMobile = smallWidth || portrait;
@@ -23,7 +23,7 @@ export const Control = () => {
   return (
     <div
       className={isMobile ? "bottomnav" : "sidenav"}
-      style={isMobile ? { width: "100%" } : { width: `${nav_width}px` }}
+      style={isMobile ? { width: "100%" } : { width: `${navigationWidth}px` }}
     >
       <Accordion defaultActiveKey="0" flush alwaysOpen>
         <Accordion.Item eventKey="0">

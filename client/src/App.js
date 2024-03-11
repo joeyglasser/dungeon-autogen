@@ -11,17 +11,14 @@ function App() {
   const dispatch = useDispatch();
   dispatch(generateMap(30, 30, 1, 20, 2));
 
-  let nav_width = useSelector((state) => state.map.nav_width);
+  let navigationWidth = useSelector((state) => state.map.navigationWidth);
   const smallWidth = useMediaQuery({ query: "(max-width: 1224px)" });
   const portrait = useMediaQuery({ query: "orientation: portrait" });
   const isMobile = smallWidth || portrait;
   if (isMobile) {
     return (
       <div className="App">
-        <div
-          id="mobilecontainer"
-          // style={mobileDisplay ? {} : { marginLeft: nav_width }}
-        ></div>
+        <div id="mobilecontainer"></div>
         <Map></Map>
         <Control></Control>
       </div>
@@ -30,7 +27,7 @@ function App() {
     return (
       <div className="App">
         <Control></Control>
-        <div id="container" style={{ marginLeft: nav_width }}></div>
+        <div id="container" style={{ marginLeft: navigationWidth }}></div>
         <Map></Map>
       </div>
     );

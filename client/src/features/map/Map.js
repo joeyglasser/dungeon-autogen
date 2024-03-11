@@ -10,9 +10,9 @@ export const Map = () => {
   const width = useSelector((state) => state.map.width);
   const height = useSelector((state) => state.map.height);
   const size = useSelector((state) => state.map.size);
-  const tile_states = useSelector((state) => state.map.tile_states);
+  const tileStates = useSelector((state) => state.map.tileStates);
   const textures = useSelector((state) => state.map.textures);
-  const nav_width = useSelector((state) => state.map.nav_width);
+  const navigationWidth = useSelector((state) => state.map.navigationWidth);
   const smallWidth = useMediaQuery({ query: "(max-width: 1224px)" });
   const portrait = useMediaQuery({ query: "orientation: portrait" });
   const isMobile = smallWidth || portrait;
@@ -26,22 +26,25 @@ export const Map = () => {
   const stageRef = React.useRef(null);
 
   // Calculating stage offsets to center map
-  let x_offset = 0;
+  let xOffset = 0;
   if (isMobile) {
-    x_offset = Math.max((window.innerWidth - width * size) / 2, 0);
+    xOffset = Math.max((window.innerWidth - width * size) / 2, 0);
   } else {
-    x_offset = Math.max((window.innerWidth - nav_width - width * size) / 2, 0);
+    xOffset = Math.max(
+      (window.innerWidth - navigationWidth - width * size) / 2,
+      0
+    );
   }
-  const y_offset = Math.max((window.innerHeight - height * size) / 2, 0);
+  const yOffset = Math.max((window.innerHeight - height * size) / 2, 0);
 
   // Rerendering and then dispatching action to save image
   useEffect(() => {
     let renderingGrid = makeGrid({
       size: size,
-      tile_states: tile_states,
+      tileStates: tileStates,
       textures: textures,
-      x_offset: 0,
-      y_offset: y_offset,
+      xOffset: 0,
+      yOffset: yOffset,
     });
 
     renderingGrid.then(async (renderedGrid) => {
@@ -60,8 +63,8 @@ export const Map = () => {
 
           // Getting image data
           const dataURL = stageRef.current.toDataURL({
-            x: x_offset,
-            y: y_offset,
+            x: xOffset,
+            y: yOffset,
             width: width * size,
             height: height * size,
             pixelRatio: scale,
@@ -78,23 +81,23 @@ export const Map = () => {
   }, [
     dispatch,
     size,
-    tile_states,
+    tileStates,
     textures,
-    x_offset,
-    y_offset,
+    xOffset,
+    yOffset,
     height,
     width,
-    nav_width,
+    navigationWidth,
     toggle,
   ]);
 
-  const rendered_grid = (
+  const renderedGrid = (
     <Fragment>
       <Stage
         width={
           isMobile
             ? Math.max(window.innerWidth, width * size)
-            : Math.max(window.innerWidth - nav_width, width * size)
+            : Math.max(window.innerWidth - navigationWidth, width * size)
         }
         height={
           isMobile
@@ -102,7 +105,7 @@ export const Map = () => {
             : Math.max(window.innerHeight, height * size)
         }
         ref={stageRef}
-        x={x_offset}
+        x={xOffset}
         container={isMobile ? "mobilecontainer" : "container"}
       >
         {grid}
@@ -110,5 +113,5 @@ export const Map = () => {
     </Fragment>
   );
 
-  return rendered_grid;
+  return renderedGrid;
 };
