@@ -1,24 +1,32 @@
 import { Layer, Rect } from "react-konva";
 
-// Generates layer of tiles composing the map grid as a promise
-// Need as a promise to load the assets to draw onto the tiles
-export function makeGrid({ size, tile_states, textures, x_offset, y_offset }) {
+/**
+ * Creates the html that is displayed for the grid
+ * @param {int} size the pixel width of the grid
+ * @param {{Array<Array <room: int, floor: bool, color: string, patternAsset: string>>}} tileStates the data that dictatates how tiles appear
+ * @param {Object<Object<smallImgURL: strinig>} textures contains assets and the Image url of the associated texture
+ * @param {*} xOffset how much offset there is in the grid on the display from the left side
+ * @param {*} yOffset how much offset there is in the grid on the display from the top
+ * @returns {Promise<html>} a promise that resolves with the html to display the grid
+ */
+function makeGrid({ size, tileStates, textures, xOffset, yOffset }) {
+  // If there are no textures, simply generate the html for the tiles with just the color
   if (Object.keys(textures).length === 0) {
     let tiles = [];
-    for (let i = 0; i < tile_states[0].length; i++) {
-      for (let j = 0; j < tile_states.length; j++) {
-        let fill = tile_states[j][i]["color"];
+    for (let i = 0; i < tileStates[0].length; i++) {
+      for (let j = 0; j < tileStates.length; j++) {
+        let fill = tileStates[j][i]["color"];
 
         tiles.push(
           <Rect
-            x={i * size + x_offset}
-            y={j * size + y_offset}
+            x={i * size + xOffset}
+            y={j * size + yOffset}
             width={size}
             height={size}
             stroke="black"
             fill={fill}
             key={`${i}_${j}_tile`}
-            strokeWidth={tile_states[j][i]["on"] ? 1 / 10 : 1}
+            strokeWidth={tileStates[j][i]["on"] ? 1 / 10 : 1}
           ></Rect>
         );
       }
@@ -27,6 +35,7 @@ export function makeGrid({ size, tile_states, textures, x_offset, y_offset }) {
     return Promise.resolve(<Layer>{tiles}</Layer>);
   }
 
+  // Helper function to load the images for each asset
   const loadImagePromise = (asset, imgSrc) => {
     return new Promise((resolve) => {
       let img = new window.Image();
@@ -58,24 +67,24 @@ export function makeGrid({ size, tile_states, textures, x_offset, y_offset }) {
 
       let tiles = [];
 
-      for (let i = 0; i < tile_states[0].length; i++) {
-        for (let j = 0; j < tile_states.length; j++) {
-          let fill = tile_states[j][i]["color"];
-          let tileAsset = tile_states[j][i]["patternAsset"];
+      for (let i = 0; i < tileStates[0].length; i++) {
+        for (let j = 0; j < tileStates.length; j++) {
+          let fill = tileStates[j][i]["color"];
+          let tileAsset = tileStates[j][i]["patternAsset"];
 
           let patternImage = null;
-          let strokeWidth = tile_states[j][i]["flooring"] ? 1 / 5 : 1;
+          let strokeWidth = tileStates[j][i]["flooring"] ? 1 / 5 : 1;
 
           if (asset_images[tileAsset]) {
             patternImage = asset_images[tileAsset];
             fill = null;
-            strokeWidth = tile_states[j][i]["flooring"] ? 1 / 5 : 0;
+            strokeWidth = tileStates[j][i]["flooring"] ? 1 / 5 : 0;
           }
 
           tiles.push(
             <Rect
-              x={i * size + x_offset}
-              y={j * size + y_offset}
+              x={i * size + xOffset}
+              y={j * size + yOffset}
               width={size}
               height={size}
               stroke="black"
@@ -91,3 +100,5 @@ export function makeGrid({ size, tile_states, textures, x_offset, y_offset }) {
     });
   });
 }
+
+export { makeGrid };
